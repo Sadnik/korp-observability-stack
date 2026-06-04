@@ -1,0 +1,177 @@
+---
+- name: " Projeto Korp - Pipeline Deployment (Fedora)"
+  hosts: all
+  become: yes
+
+  vars:
+    project_root: "{{ playbook_dir }}/.."
+    app_url: "http://127.0.0.1/projeto-korp"
+
+  tasks:
+
+  # =========================
+  # STEP 1 - SYSTEM PREPARATION
+  # =========================
+  - name: "STEP 1 - Update system packages"
+    ansible.builtin.dnf:
+      update_cache: yes
+      name: "*"
+      state: latest
+    when: ansible_facts.os_family == "RedHat"
+    register: step1
+
+  - name: "STEP 1 - Install dnf-plugins-core"
+    ansible.builtin.dnf:
+      name: dnf-plugins-core
+      state: present
+    when: ansible_facts.os_family == "RedHat"
+
+  - name: "✔ STEP 1 COMPLETE"
+    ansible.builtin.debug:
+      msg: "System updated successfully"
+
+  # =========================
+  # STEP 2 - DOCKER INSTALLATION
+  # =========================
+  - name: "STEP 2 - Add Docker CE repository"
+    ansible.builtin.command: >
+      dnf config-manager --add-repo
+      https://download.docker.com/linux/fedora/docker-ce.repo
+    args:
+      creates: /etc/yum.repos.d/docker-ce.repo
+
+  - name: "STEP 2 - Install Docker CE + Compose plugin + Python pip"
+    ansible.builtin.dnf:
+      name:
+        - docker-ce
+        - docker-ce-cli
+        - containerd.io
+        - docker-compose-plugin
+        - python3-pip
+      state: present
+    register: step2
+
+  - name: "STEP 2 - Ensure Docker service running"
+    ansible.builtin.service:
+      name: docker
+      state: started
+      enabled: yes
+
+  - name: "✔ STEP 2 COMPLETE"
+    ansible.builtin.debug:
+      msg: "Docker installed and running"
+
+  # =========================
+  # STEP 3 - USER + NETWORK SETUP
+  # =========================
+  - name: "STEP 3 - Add user to docker group"
+    ansible.builtin.user:
+      name: "{{ ansible_user }}"
+      groups: docker
+      append: yes
+
+  - name: "STEP 3 - Create Docker network"
+    ansible.builtin.shell: |
+      docker network inspect korp-network >/dev/null 2>&1 || \
+      docker network create korp-network
+    register: network_result
+    changed_when: "'created' in network_result.stdout"
+
+  - name: "✔ STEP 3 COMPLETE"
+    ansible.builtin.debug:
+      msg: "Docker network ready"
+
+  # =========================
+  # STEP 4 - VALIDATE PROJECT FILES
+  # =========================
+  - name: "STEP 4 - Validate required project files"
+    ansible.builtin.stat:
+      path: "{{ project_root }}/{{ item }}"
+    loop:
+      - docker-compose.yml
+      - go/Dockerfile
+      - go/main.go
+      - nginx/http-server-projeto-korp.conf
+      - prometheus/prometheus.yml
+      - grafana/provisioning
+    register: project_files
+
+  - name: "STEP 4 - Assert all required files exist"
+    ansible.builtin.assert:
+      that:
+        - item.stat.exists
+      fail_msg: "❌ Missing required file: {{ item.item }}"
+      success_msg: "✔ Found: {{ item.item }}"
+    loop: "{{ project_files.results }}"
+
+  - name: "✔ STEP 4 COMPLETE"
+    ansible.builtin.debug:
+      msg: "Project structure validated"
+
+  # =========================
+  # STEP 5 - DEPLOY STACK
+  # =========================
+  - name: "STEP 5 - Deploy full stack (Docker Compose)"
+    ansible.builtin.shell: |
+      docker compose up -d --build
+    args:
+      chdir: "{{ project_root }}"
+    register: deploy_result
+    retries: 2
+    delay: 5
+    until: deploy_result.rc == 0
+
+  - name: "✔ STEP 5 COMPLETE"
+    ansible.builtin.debug:
+      msg: "All containers deployed successfully"
+
+  # =========================
+  # STEP 6 - WAIT FOR SERVICES
+  # =========================
+  - name: "STEP 6 - Wait for services"
+    ansible.builtin.wait_for:
+      host: 127.0.0.1
+      port: "{{ item }}"
+      timeout: 60
+    loop:
+      - 80
+      - 3000
+      - 9090
+
+  - name: "✔ STEP 6 COMPLETE"
+    ansible.builtin.debug:
+      msg: "All services are reachable"
+
+  # =========================
+  # STEP 7 - VALIDATION CHECKS
+  # =========================
+  - name: "STEP 7 - Validate application endpoint"
+    ansible.builtin.uri:
+      url: "{{ app_url }}"
+      method: GET
+      status_code: 200
+      return_content: yes
+    register: app_check
+    retries: 10
+    delay: 3
+    until: app_check.status == 200
+
+  - name: "✔ STEP 7 COMPLETE"
+    ansible.builtin.debug:
+      msg:
+        - "Application OK: {{ app_url }}"
+        - "Response: {{ app_check.content }}"
+
+  # =========================
+  # STEP 8 - FINAL SUMMARY
+  # =========================
+  - name: "DEPLOYMENT SUCCESS SUMMARY"
+    ansible.builtin.debug:
+      msg:
+        - "===================================="
+        - "PROJETO KORP V4 DEPLOYED"
+        - "===================================="
+        - "App: http://127.0.0.1/projeto-korp"
+        - "Grafana: http://127.0.0.1:3000 (admin/admin)"
+        - "Prometheus: http://127.0.0.1:9090"
+        - "Status: ALL SYSTEMS OPERATIONAL"

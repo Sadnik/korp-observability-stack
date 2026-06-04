@@ -1,0 +1,10 @@
+github.com/prometheus/client_golang v1.17.0 h1:rl2sfSVeNnvnMsZcvOc1zUyIrxiXxJqtuvf73CKwpw=
+github.com/prometheus/client_golang v1.17.0/go.mod h1:VeL+gAIfQpYcV8aPbLLKWbBCiMwXTA/uILzNLmluSQ=
+github.com/prometheus/client_model v0.5.0 h1:VQw34+wP/LM6xlicQlwe4BRwS6nAsnlDCYSXKtzog8=
+github.com/prometheus/client_model v0.5.0/go.mod h1:dblSTQIY4aXmyucX0FwPzKf1nNLPp8f6OWjGVNwj54=
+github.com/prometheus/common v0.44.0 h1:+5BrQJwiBB9xsMygV+A2ZwSZRwsJ6lpH4HG6B7bRil4=
+github.com/prometheus/common v0.44.0/go.mod h1:ofAIvZygbt9cUJwghWeUtLt/abu10n3zV64QEZpYSI=
+github.com/prometheus/procfs v0.12.0 h1:jluTtNjk06zuPDIlPSaHeif5KYGasTSwQtW37AqWC0c=
+github.com/prometheus/procfs v0.12.0/go.mod h1:pcuDEFsWzvNgdWP7p0AwztDeVf46oCR4mEQrp620d0=
+golang.org/x/sys v0.15.0 h1:frVn1/epuqial/rh6xrlUhW6xLweFvI7mrgsSGa1nw=
+golang.org/x/sys v0.15.0/go.mod h1:/VUhepLMVzVgwt8tWjI+O6iL41uFAkL8Sen65IvD/M=

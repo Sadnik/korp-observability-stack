@@ -1,0 +1,8 @@
+---
+# Common variables for all hosts
+ansible_user: "{{ lookup('env','USER') }}"
+app_name: projeto-korp
+app_port: 8080
+deploy_dir: /opt/projeto-korp
+nginx_site_name: http-server-projeto-korp.conf
+prometheus_job_name: projeto-korp

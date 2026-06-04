@@ -1,0 +1,15 @@
+bin/
+*.exe
+*.test
+*.out
+
+.env
+.env.*
+
+*.log
+
+.vscode/
+.idea/
+
+.DS_Store
+Thumbs.db

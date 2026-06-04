@@ -1,0 +1,7 @@
+scrape_configs:
+  - job_name: "http-server-projeto-korp"
+    static_configs:
+      - targets:
+          - "http-server-projeto-korp:8080"
+    metrics_path: "/metrics"
+    scrape_interval: 5s
