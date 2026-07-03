@@ -314,7 +314,7 @@
   "schemaVersion": 38,
   "style": "dark",
   "tags": [
-    "projeto-korp",
+    "demo-service",
     "monitoring"
   ],
   "templating": {
@@ -326,8 +326,8 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "Projeto Korp - Service Monitoring",
-  "uid": "projeto-korp",
+  "title": "Observability Demonstration - Service Monitoring",
+  "uid": "demo-service",
   "version": 1,
   "weekStart": ""
 }

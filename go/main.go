@@ -10,7 +10,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-// Response structure for /projeto-korp endpoint
+// Response structure for /demo-service endpoint
 type Response struct {
 	Nome    string `json:"nome"`
 	Horario string `json:"horario"`
@@ -48,11 +48,11 @@ func init() {
 	serviceAvailability.Set(1)
 }
 
-func handleProjeto(w http.ResponseWriter, r *http.Request) {
+func handleDemoService(w http.ResponseWriter, r *http.Request) {
 	start := time.Now()
 
 	response := Response{
-		Nome:    "Projeto Korp",
+		Nome:    "Observability Demonstration",
 		Horario: time.Now().UTC().Format(time.RFC3339),
 	}
 
@@ -61,8 +61,8 @@ func handleProjeto(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 
 	duration := time.Since(start).Seconds()
-	requestCounter.WithLabelValues("GET", "/projeto-korp", "200").Inc()
-	requestDuration.WithLabelValues("GET", "/projeto-korp").Observe(duration)
+	requestCounter.WithLabelValues("GET", "/demo-service", "200").Inc()
+	requestDuration.WithLabelValues("GET", "/demo-service").Observe(duration)
 }
 
 func handleHealth(w http.ResponseWriter, r *http.Request) {
@@ -74,7 +74,7 @@ func handleHealth(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/projeto-korp", handleProjeto)
+	mux.HandleFunc("/demo-service", handleDemoService)
 	mux.HandleFunc("/health", handleHealth)
 	mux.Handle("/metrics", promhttp.Handler())
 
@@ -87,6 +87,6 @@ func main() {
 		MaxHeaderBytes: 1 << 20,
 	}
 
-	log.Printf("Starting http-server-projeto-korp on :8080")
+	log.Printf("Starting http-demo-service on :8080")
 	log.Fatal(server.ListenAndServe())
 }

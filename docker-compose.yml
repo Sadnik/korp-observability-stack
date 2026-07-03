@@ -2,13 +2,13 @@ services:
   # =========================
   # Go HTTP Server
   # =========================
-  http-server-projeto-korp:
+  http-demo-service:
     build:
       context: .
       dockerfile: go/Dockerfile
-    container_name: http-server-projeto-korp
+    container_name: http-demo-service
     networks:
-      - korp-network
+      - observability-net
     expose:
       - "8080"
     environment:
@@ -31,9 +31,9 @@ services:
     volumes:
       - ./nginx:/etc/nginx/conf.d:ro
     networks:
-      - korp-network
+      - observability-net
     depends_on:
-      - http-server-projeto-korp
+      - http-demo-service
     restart: unless-stopped
 
   # =========================
@@ -51,9 +51,9 @@ services:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--storage.tsdb.path=/prometheus"
     networks:
-      - korp-network
+      - observability-net
     depends_on:
-      - http-server-projeto-korp
+      - http-demo-service
     restart: unless-stopped
 
   # =========================
@@ -71,7 +71,7 @@ services:
       - grafana-data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning:ro
     networks:
-      - korp-network
+      - observability-net
     depends_on:
       - prometheus
     restart: unless-stopped
@@ -80,7 +80,7 @@ services:
 # Network
 # =========================
 networks:
-  korp-network:
+  observability-net:
     driver: bridge
 
 # =========================

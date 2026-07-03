@@ -1,4 +1,4 @@
-# Projeto Korp 
+# Demonstração de Stack de Observabilidade
 
 Plataforma de observabilidade construída com Go, Nginx, Prometheus, Grafana, Docker Compose e Ansible.
 
@@ -21,7 +21,6 @@ Testado com **101.219 requisições por segundo**, **0 falhas** e **latência P9
 
 ## Arquitetura
 
-
 ```text
                            +----------------+
                            |     Client     |
@@ -39,13 +38,13 @@ Testado com **101.219 requisições por segundo**, **0 falhas** e **latência P9
                            |     :8080      |
                            +--------+-------+
                                     |
-                    +---------------+---------------+
-                    |                               |
-                    v                               v
-           +----------------+              +----------------+
-           |  Prometheus    | -----------> |    Grafana     |
-           |     :9090      |              |     :3000      |
-           +----------------+              +----------------+
+                     +---------------+---------------+
+                     |                               |
+                     v                               v
+            +----------------+              +----------------+
+            |  Prometheus    | -----------> |    Grafana     |
+            |     :9090      |              |     :3000      |
+            +----------------+              +----------------+
 ```
 
 Todos os serviços executam em uma rede Docker Bridge isolada.
@@ -78,7 +77,7 @@ docker compose up -d --build
 ### Validar funcionamento
 
 ```bash
-curl http://localhost/projeto-korp
+curl http://localhost/demo-service
 ```
 
 ---
@@ -87,7 +86,7 @@ curl http://localhost/projeto-korp
 
 | Endpoint          | Descrição                                     |
 | ----------------- | --------------------------------------------- |
-| GET /projeto-korp | Retorna resposta JSON contendo nome e horário |
+| GET /demo-service | Retorna resposta JSON contendo nome e horário |
 | GET /health       | Endpoint de verificação de saúde do Nginx     |
 | GET /metrics      | Métricas utilizadas pelo Prometheus           |
 | :9090             | Interface Web do Prometheus                   |
@@ -126,7 +125,7 @@ Esse comando funciona a partir da raiz do repositório porque `ansible.cfg` defi
 Benchmark executado com:
 
 ```bash
-wrk -t16 -c400 -d30s --latency http://localhost/projeto-korp
+wrk -t16 -c400 -d30s --latency http://localhost/demo-service
 ```
 
 ### Resultados
@@ -153,7 +152,6 @@ wrk -t16 -c400 -d30s --latency http://localhost/projeto-korp
 | http_requests_total           | Counter   | Total de requisições por método, endpoint e status |
 | http_request_duration_seconds | Histogram | Distribuição de latência das requisições           |
 | service_availability          | Gauge     | Disponibilidade do serviço                         |
-
 
 Os dashboards do Grafana apresentam:
 

@@ -1,11 +1,11 @@
 ---
-- name: " Projeto Korp - Pipeline Deployment (Fedora)"
+- name: " Observability Demonstration - Pipeline Deployment (Fedora)"
   hosts: all
   become: yes
 
   vars:
     project_root: "{{ playbook_dir }}/.."
-    app_url: "http://127.0.0.1/projeto-korp"
+    app_url: "http://127.0.0.1/demo-service"
 
   tasks:
 
@@ -38,7 +38,7 @@
       dnf config-manager --add-repo
       https://download.docker.com/linux/fedora/docker-ce.repo
     args:
-      creates: /etc/yum.repos.d/docker-ce.repo
+      creates: /etc/yum/repos.d/docker-ce.repo
 
   - name: "STEP 2 - Install Docker CE + Compose plugin + Python pip"
     ansible.builtin.dnf:
@@ -72,8 +72,8 @@
 
   - name: "STEP 3 - Create Docker network"
     ansible.builtin.shell: |
-      docker network inspect korp-network >/dev/null 2>&1 || \
-      docker network create korp-network
+      docker network inspect observability-net >/dev/null 2>&1 || \
+      docker network create observability-net
     register: network_result
     changed_when: "'created' in network_result.stdout"
 
@@ -169,9 +169,9 @@
     ansible.builtin.debug:
       msg:
         - "===================================="
-        - "PROJETO KORP V4 DEPLOYED"
+        - "OBSERVABILITY DEMONSTRATION DEPLOYED"
         - "===================================="
-        - "App: http://127.0.0.1/projeto-korp"
+        - "App: http://127.0.0.1/demo-service"
         - "Grafana: http://127.0.0.1:3000 (admin/admin)"
         - "Prometheus: http://127.0.0.1:9090"
         - "Status: ALL SYSTEMS OPERATIONAL"

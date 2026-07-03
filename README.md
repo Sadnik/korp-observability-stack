@@ -1,4 +1,4 @@
-# Projeto Korp
+# Observability Demonstration Stack
 
 Production-style observability platform built with Go, Nginx, Prometheus, Grafana, Docker Compose, and Ansible.
 
@@ -16,7 +16,6 @@ Load-tested at **101,219 requests/sec** with **0 failed requests** while maintai
 
 ### Prometheus Request Rate
 ![Prometheus Request Rate](https://github.com/user-attachments/assets/6cd38172-94d9-40e7-b1d8-f95de38a9a54)
-
 
 ---
 
@@ -39,13 +38,13 @@ Load-tested at **101,219 requests/sec** with **0 failed requests** while maintai
                            |     :8080      |
                            +--------+-------+
                                     |
-                    +---------------+---------------+
-                    |                               |
-                    v                               v
-           +----------------+              +----------------+
-           |  Prometheus    | -----------> |    Grafana     |
-           |     :9090      |              |     :3000      |
-           +----------------+              +----------------+
+                     +---------------+---------------+
+                     |                               |
+                     v                               v
+            +----------------+              +----------------+
+            |  Prometheus    | -----------> |    Grafana     |
+            |     :9090      |              |     :3000      |
+            +----------------+              +----------------+
 ```
 
 All services run on an isolated Docker bridge network.
@@ -78,14 +77,14 @@ docker compose up -d --build
 ### Verify service availability
 
 ```bash
-curl http://localhost/projeto-korp
+curl http://localhost/demo-service
 ```
 
 ### Access monitoring tools
 
 | Service     | URL                           |
 | ----------- | ----------------------------- |
-| Application | http://localhost/projeto-korp |
+| Application | http://localhost/demo-service |
 | Prometheus  | http://localhost:9090         |
 | Grafana     | http://localhost:3000         |
 
@@ -101,14 +100,13 @@ admin / admin
 
 | Endpoint          | Description                                         |
 | ----------------- | --------------------------------------------------- |
-| GET /projeto-korp | Returns JSON response containing name and timestamp |
+| GET /demo-service | Returns JSON response containing name and timestamp |
 | GET /health       | Nginx health check endpoint                         |
 | GET /metrics      | Internal Prometheus metrics endpoint                |
 | :9090             | Prometheus UI                                       |
 | :3000             | Grafana UI                                          |
 
 ---
-
 
 ## Ansible Deployment
 
@@ -135,7 +133,7 @@ This works from the repository root because `ansible.cfg` now contains the defau
 Benchmark executed using:
 
 ```bash
-wrk -t16 -c400 -d30s --latency http://localhost/projeto-korp
+wrk -t16 -c400 -d30s --latency http://localhost/demo-service
 ```
 
 ### Results
@@ -164,7 +162,6 @@ The application exports custom and runtime metrics through Prometheus.
 | http_requests_total           | Counter   | Request count by method, endpoint, and status |
 | http_request_duration_seconds | Histogram | Request latency distribution                  |
 | service_availability          | Gauge     | Service availability state                    |
-
 
 Observed metrics are visualized through Grafana dashboards, including:
 
